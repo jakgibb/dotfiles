@@ -1,0 +1,21 @@
+cat /tmp/goxlast |head -n 1 |awk '{print substr($0,2,7)}'
+
+checkupdate=$(date |awk '{print $4}' | awk -F : '{print $2}' |awk '{print substr($0,2,1)}')
+
+currenttime=$(date |awk '{print $4}' |awk -F : '{print $1 ":" $2}')
+
+lastupdate=$(cat /tmp/goxlastupdate)
+
+
+if [ ! -f /tmp/goxlast ]; then
+	curl -A "Firefox" -s https://mtgox.com | grep lastPrice | awk -F '<span>' '{print $2}' | sed 's/<.*>//g' > /tmp/goxlast
+	echo $currenttime > /tmp/goxlastupdate
+fi
+
+if [ "$checkupdate" == 0 ] || [ "$checkupdate" == 5 ]; then
+	if [ "$lastupdate" != "$currenttime" ]; then
+		curl -A "Firefox" -s https://mtgox.com | grep lastPrice | awk -F '<span>' '{print $2}' | sed 's/<.*>//g' > /tmp/goxlast
+		echo $currenttime > /tmp/goxlastupdate
+	fi
+fi
+

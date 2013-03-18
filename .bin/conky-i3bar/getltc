@@ -1,0 +1,20 @@
+cat /tmp/ltclast
+
+checkupdate=$(date |awk '{print $4}' | awk -F : '{print $2}' |awk '{print substr($0,2,1)}')
+
+currenttime=$(date |awk '{print $4}' |awk -F : '{print $1 ":" $2}')
+
+lastupdate=$(cat /tmp/ltclastupdate)
+
+
+if [ ! -f /tmp/ltclast ]; then
+	curl -A "Firefox" -s https://btc-e.com/exchange/ltc_btc |grep "Last Price" |awk -F '<strong>' '{print $2}' |awk '{print $1}' > /tmp/ltclast
+	echo $currenttime > /tmp/ltclastupdate
+fi
+
+if [ "$checkupdate" == 0 ] || [ "$checkupdate" == 5 ]; then
+	if [ "$lastupdate" != "$currenttime" ]; then
+		curl -A "Firefox" -s https://btc-e.com/exchange/ltc_btc |grep "Last Price" |awk -F '<strong>' '{print $2}' |awk '{print $1}' > /tmp/ltclast
+		echo $currenttime > /tmp/ltclastupdate
+	fi
+fi
