@@ -29,12 +29,10 @@ alias kim-mount="echo 'Mounting kim (France) to /mnt/server' ; sshfs kim: /mnt/s
 alias kim-mountweb="echo 'Mounting kim:web (France) to /mnt/server' ; sshfs kim:/var/www/ /mnt/server/ -o idmap=user"
 alias kim-tunnel="echo 'Opening encrypted tunnel. SSH -ND 22222 kim' ; ssh -ND 22222 kim"
 alias kim-tor="echo 'ssh kim -NL 20050:localhost:20050' ; ssh kim -NL 20050:localhost:20050"
-alias toz="echo 'scp -P 44444 $2 jd@37.59.36.111:/data/downloads/torrents/watch'"
 
 alias mplayer="mplayer -quiet"
 alias cc="clear"
 alias xx="kill -9 $$"
-alias wi="wicd-curses ; sudo arp -s 192.168.1.254 3c:81:d8:72:e4:08"
 alias rr="reset"
 alias lsl="ls -l"
 alias lsa="ls -la"
