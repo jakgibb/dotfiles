@@ -29,22 +29,20 @@ override_utf8_locale no
 
 # number of cpu samples to average
 # set to 1 to disable averaging
-cpu_avg_samples 2
+#cpu_avg_samples 1
 
 # Stuff after 'TEXT' will be formatted on screen
 TEXT
 
 # JSON for i3bar
-
 [
-{ "full_text" : "฿: ${exec /home/jd/.bin/conky-i3bar/getgox}" , "color" : "\#595959" },
-{ "full_text" : "Ł: ${exec /home/jd/.bin/conky-i3bar/getltc}" , "color" : "\#595959" },
-{ "full_text" : "IP: ${addr wlp3s0}" , "color" : "\#595959" },
-{ "full_text" : "Firewall: ${exec systemctl status iptables |grep Active |awk '{print $2}'}" , "color" : "\#595959" },
-{ "full_text" : "B: ${battery_percent BAT1}%" , "color" : "\#595959" },
-{ "full_text" : "D:${fs_free /data}" , "color" : "\#595959" },
-{ "full_text" : "H: ${fs_free /home}" , "color" : "\#595959" },
-{ "full_text" : "V: ${exec /home/jd/.bin/conky-i3bar/getvol}%" , "color" : "\#595959" },
-{ "full_text" : "${Time %a %b %d %H:%M}" , "color" : "\#595959" }
+{ "full_text" : ":: BTC: ${execi 70 curl btc.cm/last} | :: LTC ${execi 70 curl btc.cm/ltc/last}" , "color" : "\#595959" },
+{ "full_text" : ":: W1: ${addr w1} | :: W2 ${addr w2}" , "color" : "\#595959" },
+{ "full_text" : ":: EN: ${exec /home/jd/.bin/conky-i3bar/sshenc}" , "color" : "\#595959" },
+{ "full_text" : ":: FW: ${exec systemctl status iptables |grep Active |awk '{print $2}'}" , "color" : "\#595959" },
+{ "full_text" : ":: BT: ${exec /home/jd/.bin/conky-i3bar/battery}%" , "color" : "\#595959" },
+{ "full_text" : ":: HF: ${fs_free /home}" , "color" : "\#595959" },
+{ "full_text" : ":: VL: ${exec /home/jd/.bin/conky-i3bar/getvol}%" , "color" : "\#595959" },
+{ "full_text" : ":: ${Time %a %b %d %H:%M}" , "color" : "\#595959" }
 ],
 
