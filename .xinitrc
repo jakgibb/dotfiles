@@ -1,4 +1,5 @@
-xcompmgr &
 xbindkeys &
-feh --bg-scale ~/.themes/background.jpg &
+xcompmgr &
+feh --bg-center .themes/background2.jpg &
+xrdb -merge .Xresources
 exec i3
