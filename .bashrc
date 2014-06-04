@@ -1,12 +1,28 @@
+PS1='\[\e[0;36m\]\A \[\e[0;36m\]\u@lenny\n[ \w ]\[\e[0;36m\]: \[\e[0m\]'
+
 # If not running interactively, don't do anything
-[[ $- != *i* ]] && return
+[ -z "$PS1" ] && return
 
-PS1='\[\e[0;33m\]\A \[\e[0;33m\]\u@lenny\n[ \w ]\[\e[0;37m\]: \[\e[0m\]'
-
+PATH=$PATH:~/.bin
+export PATH
+export LANG="en_GB.UTF-8"
 complete -cf sudo
 
-PATH=$PATH:~/.bin:/data/devel/android/adt-bundle-linux-x86_64-20130219/sdk/platform-tools
-export PATH
+# don't put duplicate lines in the history. See bash(1) for more options
+# don't overwrite GNU Midnight Commander's setting of `ignorespace'.
+HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+
+# enable programmable completion features
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
 
 if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
@@ -15,29 +31,30 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-export HISTCONTROL=ignoreboth
-
 # Use up and down arrow to search the history
 bind '"\e[A"':history-search-backward
 bind '"\e[B"':history-search-forward
 
-alias pacup="sudo pacman -Syu"
-alias pacg="sudo pacman -S"
-alias pacs="pacman -Ss"
-
-alias kim-mount="echo 'Mounting kim (France) to /mnt/server' ; sshfs kim: /mnt/server/ -o idmap=user"
-alias kim-mountweb="echo 'Mounting kim:web (France) to /mnt/server' ; sshfs kim:/var/www/ /mnt/server/ -o idmap=user"
-alias kim-tunnel="echo 'Opening encrypted tunnel. SSH -ND 22222 kim' ; ssh -ND 22222 kim"
-alias kim-tor="echo 'ssh kim -NL 20050:localhost:20050' ; ssh kim -NL 20050:localhost:20050"
-
-alias mplayer="mplayer -quiet"
 alias cc="clear"
 alias xx="kill -9 $$"
 alias rr="reset"
 alias lsl="ls -l"
 alias lsa="ls -la"
 alias nano="nano -wxz"
-alias qr="ttyqr -b"
+alias scr="screen -r"
+alias fer-tunnel="echo \"Opening encrypted tunnel\" ; ssh -ND 22222 fer -f"
+alias enabled-services="systemctl list-unit-files |grep enabled"
+alias wi="wicd-curses"
+
+#pacman
+alias pacup="sudo pacman -Syu"
+alias pacs="pacman -Ss"
+alias paci="pacman -Si"
+alias pacg="sudo pacman -S"
+alias epacup="sudo proxychains pacman -Syu"
+alias epacs="proxychains pacman -Ss"
+alias epaci="proxychains pacman -Si"
+alias epacg="sudo proxychains pacman -S"
 
 function sslcrypt {
   item=$(echo $1 | sed -e 's/\/$//') # get rid of trailing / on directories
@@ -62,7 +79,10 @@ function ssldecrypt {
     exit 1;
   fi
 
-  openssl enc -d -a -aes-256-cbc -in "${item}" > "${item}.decrypted"
+  openssl enc -d -a -aes-256-cbc -in "${item}" > "${item}.decrypted" 2>/dev/null
+	if [ $? -ne 0 ];then
+		echo "Wrong decryption password"
+	fi
 }
 
 extract () {
@@ -70,14 +90,13 @@ extract () {
          case $1 in
              *.tar.bz2)   tar xjf $1        ;;
              *.tar.gz)    tar xzf $1     ;;
-             *.bz2)       bunzip2 $1       ;;
+             *.bz2)       bunzip2 -k -v $1       ;;
              *.rar)       rar x $1     ;;
-             *.gz)        gunzip $1     ;;
+             *.gz)        gunzip -k -v $1     ;;
              *.tar)       tar xf $1        ;;
              *.tbz2)      tar xjf $1      ;;
              *.tgz)       tar xzf $1       ;;
              *.zip)       unzip $1     ;;
-             *.tar.xz)    tar xvf $1     ;;
              *.Z)         uncompress $1  ;;
              *.7z)        7z x $1    ;;
              *)           echo "'$1' cannot be extracted via extract()" ;;
@@ -86,3 +105,6 @@ extract () {
          echo "'$1' is not a valid file"
      fi
 }
+
+
+
