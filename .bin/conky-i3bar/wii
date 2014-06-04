@@ -1,0 +1,41 @@
+#Networking is not enabled on boot (intended)
+#Starts various network routines on command execution
+
+#check if wicd active
+status=$(systemctl is-active wicd)
+
+#change mac if desired
+echo -n "[?] Change MAC? [y/n]: "
+read ans
+if [ "$ans" == "y" ] || [ "$ans" == "" ]
+then
+	sudo ifconfig w1 down
+	sudo macchanger -r w1
+	sudo ifconfig w1 up
+fi
+
+#start wicd if not already
+if [ "$status" != "active" ]
+then
+	echo "[*] Starting wicd"
+	sudo systemctl start wicd && wicd-curses
+else
+	wicd-curses
+fi
+
+#check if SSH tunnel is already open
+pidOfSsh=$(lsof -i -P |grep 22222 | awk '{print $2}' |head -n 1)
+
+#display status of firewall
+echo -n "[*] Firewall status: "
+systemctl status iptables |grep Active |awk '{print $2}'
+
+#open tunnel if requested
+echo -n "[?] Open encrypted tunnel [y/n]: "
+read ans
+if [ "$ans" == "y" ] || [ "$ans" == "" ]
+then
+	kill $pidOfSsh 2>/dev/null
+	echo "[*] Opening encrypted tunnel"
+	ssh -ND 22222 fer -f
+fi
