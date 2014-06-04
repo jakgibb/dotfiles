@@ -1,0 +1,10 @@
+open=$(netstat -l |grep 22222)
+
+if [ -n "$open" ]
+then
+	message="enabled"
+else
+	message="disabled"
+fi
+
+echo $message
