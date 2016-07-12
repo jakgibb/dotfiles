@@ -1,0 +1,55 @@
+echo -n "Net/VPN-NL/FW[1], Net/VPN-UK/FW[2], Net/No VPN/Lax FW[3], Restart VPN[4], Disconnect[5]: "
+read ans
+
+if [ "$ans" == "1" ]
+then
+	sudo netctl stop-all
+  sudo ifconfig wlp2s0 down
+  sudo macchanger -r wlp2s0 1>/dev/null && echo "+MAC changed"
+  sleep 1
+  sudo systemctl restart iptables && echo "+VPN firewall set"
+	sudo netctl start home && echo "+Net connected: $(ip addr show wlp2s0 |grep inet |awk '{print $2}')"
+	sudo systemctl restart openvpn@sysop && sleep 5 && echo "+VPN (NL) connected: $(ip addr show tun0 |grep inet |awk '{print $2}')"
+  echo "nameserver 10.8.0.1" | sudo tee /etc/resolv.conf 1>/dev/null && echo "+DNS Updated: $(cat /etc/resolv.conf)"
+	sleep 3 && echo -n "+External IP: " && curl ifconfig.co
+fi
+
+if [ "$ans" == "2" ]
+then
+	sudo netctl stop-all
+  sudo ifconfig wlp2s0 down
+  sudo macchanger -r wlp2s0 1>/dev/null && echo "+MAC changed"
+  sleep 1
+  sudo systemctl restart iptables && echo "+VPN firewall set"
+	sudo netctl start home && echo "+Net connected: $(ip addr show wlp2s0 |grep inet |awk '{print $2}')"
+	sudo systemctl restart openvpn@sysop-uk && sleep 5 && echo "+VPN (UK) connected: $(ip addr show tun0 |grep inet |awk '{print $2}')"
+  echo "nameserver 10.9.0.1" | sudo tee /etc/resolv.conf 1>/dev/null && echo "+DNS Updated: $(cat /etc/resolv.conf)"
+	sleep 3 && echo -n "+External IP: " && curl ifconfig.co
+fi
+
+if [ "$ans" == "3" ]
+then
+	sudo netctl stop-all
+	sudo systemctl stop openvpn@*
+  sudo ifconfig wlp2s0 down
+  sudo macchanger -r wlp2s0 1>/dev/null && echo "+MAC changed"
+  sleep 1
+  sudo iptables-restore /etc/iptables/iptables-novpn.rules && echo "+No VPN firewall set"
+	sudo netctl start home && echo "+Net connected: $(ip addr show wlp2s0 |grep inet |awk '{print $2}')"
+  echo "nameserver 192.168.1.1" | sudo tee /etc/resolv.conf 1>/dev/null && echo "+DNS Updated: $(cat /etc/resolv.conf)"
+	sleep 1 && echo -n "+External IP: " && curl ifconfig.co
+fi
+
+if [ "$ans" == "4" ]
+then
+	sudo systemctl restart openvpn@sysop && echo "+VPN (NL) connected"
+fi
+
+if [ "$ans" == "5" ]
+then
+sudo systemctl stop openvpn@* && echo "+VPN stopped"
+sudo netctl stop-all && echo "+Net down"
+sudo iptables-restore /etc/iptables/block.rules && echo "+Block FW set"
+sudo ifconfig wlp2s0 down && echo "+wlp2s0 down"
+sudo ifconfig enp1s0 down && echo "+enp1s0 down"
+fi
