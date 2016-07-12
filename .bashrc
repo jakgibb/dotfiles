@@ -1,6 +1,6 @@
-PS1='\[\e[0;36m\]\A \[\e[0;36m\]\u@lenny\n[ \w ]\[\e[0;36m\]: \[\e[0m\]'
+	
+PS1='\[\e[0;36m\]\A \[\e[0;36m\]\u@create\n[ \w ]\[\e[0;36m\]: \[\e[0m\]'
 
-# If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
 PATH=$PATH:~/.bin
@@ -8,18 +8,10 @@ export PATH
 export LANG="en_GB.UTF-8"
 complete -cf sudo
 
-# don't put duplicate lines in the history. See bash(1) for more options
-# don't overwrite GNU Midnight Commander's setting of `ignorespace'.
 HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
-# ... or force ignoredups and ignorespace
 HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
 shopt -s histappend
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-
-# enable programmable completion features
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
@@ -31,7 +23,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# Use up and down arrow to search the history
 bind '"\e[A"':history-search-backward
 bind '"\e[B"':history-search-forward
 
@@ -42,9 +33,12 @@ alias lsl="ls -l"
 alias lsa="ls -la"
 alias nano="nano -wxz"
 alias scr="screen -r"
-alias fer-tunnel="echo \"Opening encrypted tunnel\" ; ssh -ND 22222 fer -f"
+alias sysop-tunnel="echo \"Opening encrypted tunnel\" ; ssh -ND 22222 sysop -f"
+alias sysop-tor="echo 'ssh sysop -f -N -L 19050:localhost:19050' ; ssh sysop -f -N -L 19050:localhost:19050"
 alias enabled-services="systemctl list-unit-files |grep enabled"
-alias wi="wicd-curses"
+alias firewall-off="sudo systemctl stop iptables"
+alias firewall-on="sudo systemctl start iptables"
+alias dec="sudo cryptsetup luksOpen"
 
 #pacman
 alias pacup="sudo pacman -Syu"
@@ -56,11 +50,17 @@ alias epacs="proxychains pacman -Ss"
 alias epaci="proxychains pacman -Si"
 alias epacg="sudo proxychains pacman -S"
 
+function pword {
+	word=$1
+	printf $word | sha256sum
+}
+
 function sslcrypt {
   item=$(echo $1 | sed -e 's/\/$//') # get rid of trailing / on directories
 
   if [ ! -r $item ]; then
-    exit 1;
+    echo "No such file"
+    exit 1
   fi
 
   if [ -d $item ]; then
@@ -76,10 +76,42 @@ function ssldecrypt {
   item=$1
 
   if [ ! -r $item ]; then
-    exit 1;
+    echo "No such file"
+    exit 1
   fi
 
   openssl enc -d -a -aes-256-cbc -in "${item}" > "${item}.decrypted" 2>/dev/null
+	if [ $? -ne 0 ];then
+		echo "Wrong decryption password"
+	fi
+}
+
+function gpgcrypt {
+  item=$(echo $1 | sed -e 's/\/$//') # get rid of trailing / on directories
+
+  if [ ! -r $item ]; then
+    echo "No such file"
+    exit 1
+  fi
+
+  if [ -d $item ]; then
+    tar zcf "${item}.tar.gz" "${item}"
+    gpg --output "${item}.tar.gz.gpg" --symmetric --cipher-algo AES256 "${item}.tar.gz"    
+    rm -f "${item}.tar.gz"
+  else
+    gpg --output "${item}.gpg" --symmetric --cipher-algo AES256 "${item}"    
+  fi
+}
+
+function gpgdecrypt {
+  item=$1
+
+  if [ ! -r $item ]; then
+    echo "No such file"
+    exit 1
+  fi
+
+  gpg --output "${item}.gpg.decrypted" --decrypt "${item}"
 	if [ $? -ne 0 ];then
 		echo "Wrong decryption password"
 	fi
@@ -105,6 +137,3 @@ extract () {
          echo "'$1' is not a valid file"
      fi
 }
-
-
-
