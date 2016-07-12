@@ -1,12 +1,12 @@
 set $mod Mod4
 
-set $w1 1 FF
-set $w2 2 CH
-set $w3 3 Dev
-set $w4 4 Comms
-set $w5 5 Crypto
-set $w6 6 Server
-set $w7 7 Misc
+set $w1 1 NET
+set $w2 2 TERM
+set $w3 3 SSH
+set $w4 4 MSC
+set $w5 5 MSC
+
+for_window [class="^.*"] border pixel 2
 
 # lock screen
 bindsym $mod+l exec i3lock
@@ -83,8 +83,6 @@ bindsym $mod+2 workspace $w2
 bindsym $mod+3 workspace $w3
 bindsym $mod+4 workspace $w4
 bindsym $mod+5 workspace $w5
-bindsym $mod+6 workspace $w6
-bindsym $mod+7 workspace $w7
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace $w1
@@ -92,8 +90,6 @@ bindsym $mod+Shift+2 move container to workspace $w2
 bindsym $mod+Shift+3 move container to workspace $w3
 bindsym $mod+Shift+4 move container to workspace $w4
 bindsym $mod+Shift+5 move container to workspace $w5
-bindsym $mod+Shift+6 move container to workspace $w6
-bindsym $mod+Shift+7 move container to workspace $w7
 
 # reload the configuration file
 bindsym $mod+Shift+C reload
@@ -130,7 +126,7 @@ bindsym $mod+r mode "resize"
 
 # Colors
 # class                 border  backgr. text
-client.focused          #af0202 #000000 #595959
+client.focused          #4F7998 #000000 #595959
 client.focused_inactive #545454 #000000 #595959
 client.unfocused        #545454 #000000 #595959
 client.urgent           #ff4500 #ff4500 #AB0101
@@ -146,10 +142,10 @@ client.background       #ffffff
 #}
 
 bar {
-	status_command /home/jd/.bin/conky-i3bar/conky-i3bar
+	status_command i3blocks
 	position top
 	colors {
-        background #000000
+        background #000307
         statusline #909090
         focused_workspace  #909090 #000000
         active_workspace   #ffffff #000000
@@ -158,3 +154,7 @@ bar {
 	}
 }
 exec --no-startup-id xset dpms 600
+exec --no-startup-id xbindkeys -f ~/.xbindkeysrc &
+exec --no-startup-id xcompmgr &
+exec --no-startup-id feh --bg-scale ~/.themes/tile.png &
+exec --no-startup-id dunst -geometry 300x0+0+0 &
