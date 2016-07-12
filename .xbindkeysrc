@@ -1,6 +1,6 @@
 keystate_numlock = disable
 
-"sakura"
+"urxvt"
     m:0x8 + c:28
     Alt + t
     
