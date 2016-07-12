@@ -57,7 +57,7 @@ function sslcrypt {
     echo "No such file"
     exit 1
   fi
-
+  
   if [ -d $item ]; then
     tar zcf "${item}.tar.gz" "${item}"
     openssl enc -aes-256-cbc -a -salt -in "${item}.tar.gz" -out "${item}.tar.gz.ssl"
