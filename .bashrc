@@ -50,11 +50,6 @@ alias epacs="proxychains pacman -Ss"
 alias epaci="proxychains pacman -Si"
 alias epacg="sudo proxychains pacman -S"
 
-function pword {
-	word=$1
-	printf $word | sha256sum
-}
-
 function sslcrypt {
   item=$(echo $1 | sed -e 's/\/$//') # get rid of trailing / on directories
 
